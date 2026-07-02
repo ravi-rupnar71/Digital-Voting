@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vote Recorded — Digital Voting System</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <div class="seal">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+    </div>
+
+    <h1>Vote Recorded</h1>
+    <h2>Thank you — your vote is final</h2>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class="flashes">
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <p style="text-align:center; font-size:13px; color:var(--color-ink-soft); margin-top:0;">
+      Each voter may cast only one vote. A confirmation email has been sent
+      to your registered email address.
+    </p>
+
+    <a class="btn btn-block" style="margin-top:8px;" href="{{ url_for('results') }}">View Live Results</a>
+    <a class="btn btn-secondary btn-block" style="margin-top:8px; text-align:center;" href="{{ url_for('logout') }}">Logout</a>
+  </div>
+</body>
+</html>

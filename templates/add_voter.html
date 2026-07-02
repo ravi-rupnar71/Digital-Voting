@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Voter — Digital Voting System</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <p class="eyebrow">Election Administration</p>
+    <h1>Add Voter</h1>
+    <h2>A confirmation email with login details will be sent to the voter</h2>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class="flashes">
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('add_voter') }}">
+      <label for="voter_id">Voter ID</label>
+      <input type="text" id="voter_id" name="voter_id" placeholder="e.g. V003" required autofocus>
+
+      <label for="name">Voter Name</label>
+      <input type="text" id="name" name="name" placeholder="e.g. Jaysinh Shinde" required>
+
+      <label for="email">Voter Email</label>
+      <input type="email" id="email" name="email" placeholder="voter@example.com" required>
+
+      <label for="password">Password</label>
+      <input type="text" id="password" name="password" placeholder="Set a password for this voter" required>
+
+      <button type="submit">Add Voter</button>
+    </form>
+
+    <hr class="tear-line">
+    <p class="center-link"><a href="{{ url_for('admin_dashboard') }}">← Back to Dashboard</a></p>
+  </div>
+</body>
+</html>

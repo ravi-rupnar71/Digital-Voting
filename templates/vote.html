@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cast Your Vote — Digital Voting System</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <p class="eyebrow">Official Ballot</p>
+    <h1>Cast Your Vote</h1>
+    <p class="voter-greeting">Logged in as <strong>{{ voter_name }}</strong></p>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class="flashes">
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    {% if candidates %}
+      <form method="POST" action="{{ url_for('vote') }}">
+        <div class="candidate-list">
+          {% for candidate in candidates %}
+            <label class="candidate-card" for="cand-{{ candidate['id'] }}">
+              <input type="radio" id="cand-{{ candidate['id'] }}" name="candidate" value="{{ candidate['id'] }}" required>
+              <span>
+                <div class="candidate-name">{{ candidate['name'] }}</div>
+                <div class="candidate-party">{{ candidate['party'] }}</div>
+              </span>
+            </label>
+          {% endfor %}
+        </div>
+        <button type="submit">Submit Vote</button>
+      </form>
+    {% else %}
+      <p class="empty-note">No candidates have been added yet. Please contact the election admin.</p>
+    {% endif %}
+
+    <hr class="tear-line">
+    <p class="center-link"><a href="{{ url_for('logout') }}">Logout</a></p>
+  </div>
+</body>
+</html>

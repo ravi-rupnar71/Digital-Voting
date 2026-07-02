@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Candidate — Digital Voting System</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <p class="eyebrow">Election Administration</p>
+    <h1>Add Candidate</h1>
+    <h2>A confirmation email will be sent to the candidate</h2>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class="flashes">
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('add_candidate') }}">
+      <label for="name">Candidate Name</label>
+      <input type="text" id="name" name="name" placeholder="e.g. Candidate A" required autofocus>
+
+      <label for="party">Party</label>
+      <input type="text" id="party" name="party" placeholder="e.g. Party One" required>
+
+      <label for="email">Candidate Email</label>
+      <input type="email" id="email" name="email" placeholder="candidate@example.com" required>
+
+      <button type="submit">Add Candidate</button>
+    </form>
+
+    <hr class="tear-line">
+    <p class="center-link"><a href="{{ url_for('admin_dashboard') }}">← Back to Dashboard</a></p>
+  </div>
+</body>
+</html>
