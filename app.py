@@ -21,7 +21,7 @@ OTP_EXPIRY_SECONDS = 120
 SEND_REAL_EMAILS = True
 
 EMAIL_ADDRESS = "ravirupnar771@gmail.com"     
-EMAIL_PASSWORD = "xbwkjhrhzxphjlow"        
+EMAIL_PASSWORD = ""        
 
 EMAIL_REGEX = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
