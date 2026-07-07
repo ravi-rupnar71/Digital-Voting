@@ -1,0 +1,123 @@
+<div class="container wide">
+  <p class="eyebrow">Election Administration</p>
+  <h1>Admin Dashboard</h1>
+  <h2>Manage candidates and voters</h2>
+
+  <ul class="flashes" *ngIf="messages && messages.length > 0">
+    <li *ngFor="let message of messages">{{ message }}</li>
+  </ul>
+
+  <div class="stat-row">
+    <div class="stat-box">
+      <div class="stat-num">{{ voters.length }}</div>
+      <div class="stat-label">Registered Voters</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num">{{ votedCount }}</div>
+      <div class="stat-label">Votes Cast</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num">{{ candidates.length }}</div>
+      <div class="stat-label">Candidates</div>
+    </div>
+  </div>
+
+  <div class="action-row">
+    <a class="btn" routerLink="/add-candidate">+ Add Candidate</a>
+    <a class="btn" routerLink="/add-voter">+ Add Voter</a>
+    <a class="btn btn-secondary" routerLink="/results">View Results</a>
+    <button type="button" class="btn btn-secondary" (click)="confirmResetVotes()">Reset Votes</button>
+  </div>
+
+  <p class="section-title">Candidates</p>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Party</th>
+        <th>Email</th>
+        <th>Votes</th>
+        <th>Verified</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let c of candidates">
+        <td>{{ c.name }}</td>
+        <td>{{ c.party }}</td>
+        <td>{{ c.email }}</td>
+        <td>{{ c.votes }}</td>
+        <td>
+          <span [ngClass]="c.is_verified === 1 ? 'voted-yes' : 'voted-no'">
+            {{ c.is_verified === 1 ? 'Yes' : 'No' }}
+          </span>
+        </td>
+        <td>
+          <div class="action-links">
+            <a [routerLink]="['/edit-candidate', c.id]">Edit</a>
+            <button type="button" (click)="confirmDelete(c.id, 'candidate')">Delete</button>
+            <button *ngIf="c.is_verified !== 1" type="button" (click)="verifyCandidate(c.id)">Verify</button>
+          </div>
+        </td>
+      </tr>
+      <tr *ngIf="candidates.length === 0">
+        <td colspan="6" class="empty-note">No candidates added yet.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="section-title">Voters</p>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Voter ID</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Voted?</th>
+        <th>Verified</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let v of voters">
+        <td>{{ v.voter_id }}</td>
+        <td>{{ v.name }}</td>
+        <td>{{ v.email }}</td>
+        <td>
+          <span [ngClass]="v.has_voted === 1 ? 'voted-yes' : 'voted-no'">
+            {{ v.has_voted === 1 ? 'Yes' : 'No' }}
+          </span>
+        </td>
+        <td>
+          <span [ngClass]="v.is_verified === 1 ? 'voted-yes' : 'voted-no'">
+            {{ v.is_verified === 1 ? 'Yes' : 'No' }}
+          </span>
+        </td>
+        <td>
+          <div class="action-links">
+            <a [routerLink]="['/edit-voter', v.id]">Edit</a>
+            <button type="button" (click)="confirmDelete(v.id, 'voter')">Delete</button>
+            <button *ngIf="v.is_verified !== 1" type="button" (click)="verifyVoter(v.id)">Verify</button>
+          </div>
+        </td>
+      </tr>
+      <tr *ngIf="voters.length === 0">
+        <td colspan="6" class="empty-note">No voters added yet.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <hr class="tear-line">
+  <p class="center-link"><a routerLink="/logout">Logout</a></p>
+</div>
+
+<div class="modal-backdrop" [class.hidden]="!isModalOpen" (click)="onBackdropClick($event)">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <h3>{{ modalTitle }}</h3>
+    <p>{{ modalMessage }}</p>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-secondary modal-cancel" (click)="closeModal()">Cancel</button>
+      <button type="button" class="btn modal-confirm" (click)="executeModalAction()">Continue</button>
+    </div>
+  </div>
+</div>

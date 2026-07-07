@@ -1,0 +1,31 @@
+<div class="container">
+  <p class="eyebrow">Election Administration</p>
+  <h1>Edit Candidate</h1>
+  <h2>Update the candidate details below</h2>
+
+  <ul class="flashes" *ngIf="messages && messages.length > 0">
+    <li *ngFor="let message of messages">{{ message }}</li>
+  </ul>
+
+  <form [formGroup]="editForm" (ngSubmit)="onSubmit()">
+    <label for="name">Candidate Name</label>
+    <input type="text" id="name" formControlName="name" autofocus>
+
+    <label for="party">Party</label>
+    <input type="text" id="party" formControlName="party">
+
+    <label for="email">Candidate Email</label>
+    <input type="email" id="email" formControlName="email">
+
+    <label for="password">New Password (leave blank to keep current)</label>
+    <input type="text" id="password" formControlName="password" placeholder="Optional">
+
+    <button type="submit" [disabled]="editForm.invalid">Save Changes</button>
+  </form>
+
+  <hr class="tear-line">
+  
+  <p class="center-link">
+    <a routerLink="/admin-dashboard">← Back to Dashboard</a>
+  </p>
+</div>

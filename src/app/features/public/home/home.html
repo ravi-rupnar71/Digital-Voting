@@ -1,0 +1,26 @@
+<div class="container">
+  <p class="eyebrow">Secure Electronic Ballot</p>
+  <h1>Digital Voting System</h1>
+  <h2>Please choose how you'd like to continue</h2>
+
+  <ul class="flashes" *ngIf="messages && messages.length > 0">
+    <li *ngFor="let message of messages">{{ message }}</li>
+  </ul>
+
+  <div class="choice-row">
+    <a class="choice-card" routerLink="/voter-login">
+      <div class="choice-title">Voter Login</div>
+      <div class="choice-sub">Login with your Voter ID to cast your vote</div>
+    </a>
+
+    <a class="choice-card" routerLink="/admin-login">
+      <div class="choice-title">Admin Login</div>
+      <div class="choice-sub">Manage candidates and voters</div>
+    </a>
+  </div>
+
+  <hr class="tear-line">
+  <p class="center-link">
+    <a routerLink="/results">View live election results →</a>
+  </p>
+</div>

@@ -1,0 +1,22 @@
+<div class="container">
+  <p class="eyebrow">Email Verification</p>
+  <h1>Verify Your Email</h1>
+  <h2>Enter the 6-digit code that was sent to {{ targetEmail }}</h2>
+
+  <ul class="flashes" *ngIf="messages && messages.length > 0">
+    <li *ngFor="let message of messages">{{ message }}</li>
+  </ul>
+
+  <form [formGroup]="verifyForm" (ngSubmit)="onSubmit()">
+    <label for="otp">Verification Code</label>
+    <input type="text" id="otp" formControlName="otp" maxlength="6" autofocus>
+
+    <button type="submit" [disabled]="verifyForm.invalid">Verify Email</button>
+    
+    <button type="button" class="btn-secondary" (click)="resendCode()">Resend Code</button>
+  </form>
+
+  <p class="center-link">
+    The code expires in {{ secondsLeft }} seconds.
+  </p>
+</div>

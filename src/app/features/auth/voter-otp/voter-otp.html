@@ -1,0 +1,22 @@
+<div class="container">
+  <p class="eyebrow">Two-Step Verification</p>
+  <h1>Enter OTP</h1>
+  <h2>We emailed a 6-digit code to verify it's really you</h2>
+
+  <ul class="flashes" *ngIf="messages && messages.length > 0">
+    <li *ngFor="let message of messages">{{ message }}</li>
+  </ul>
+
+  <form [formGroup]="otpForm" (ngSubmit)="onSubmit()">
+    <label for="otp">6-digit OTP</label>
+    <input type="text" id="otp" formControlName="otp" inputmode="numeric" pattern="[0-9]*"
+           maxlength="6" placeholder="123456" required autofocus>
+
+    <button type="submit">Verify &amp; Continue</button>
+    <button type="button" class="btn-secondary" (click)="resendOtp()">Resend OTP</button>
+  </form>
+
+  <hr class="tear-line">
+  <p class="center-link"><a routerLink="/voter-login">← Back to Login</a></p>
+</div>
+

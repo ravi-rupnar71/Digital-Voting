@@ -1,0 +1,30 @@
+<div class="container">
+  <p class="eyebrow">Election Administration</p>
+  <h1>Add Candidate</h1>
+  <h2>A confirmation email will be sent to the candidate</h2>
+
+  <ul class="flashes" *ngIf="messages && messages.length > 0">
+    <li *ngFor="let message of messages">{{ message }}</li>
+  </ul>
+
+  <form [formGroup]="candidateForm" (ngSubmit)="onSubmit()">
+    <label for="name">Candidate Name</label>
+    <input type="text" id="name" formControlName="name" placeholder="e.g. Candidate A" autofocus>
+
+    <label for="party">Party</label>
+    <input type="text" id="party" formControlName="party" placeholder="e.g. Party One">
+
+    <label for="email">Candidate Email</label>
+    <input type="email" id="email" formControlName="email" placeholder="candidate@example.com">
+
+    <label for="password">Password</label>
+    <input type="password" id="password" formControlName="password" placeholder="Set a password for this candidate">
+
+    <button type="submit" [disabled]="candidateForm.invalid">Add Candidate</button>
+  </form>
+
+  <hr class="tear-line">
+  <p class="center-link">
+    <a routerLink="/admin-dashboard">← Back to Dashboard</a>
+  </p>
+</div>

@@ -1,0 +1,28 @@
+<div class="container">
+  <p class="eyebrow">Two-Step Verification</p>
+  <h1>Admin Verification</h1>
+  <h2>We sent a 6-digit code to your admin email.</h2>
+
+  <ul class="flashes" *ngIf="messages && messages.length > 0">
+    <li *ngFor="let message of messages">{{ message }}</li>
+  </ul>
+
+  <form [formGroup]="otpForm" (ngSubmit)="onSubmit()">
+    <label for="otp">6-digit OTP</label>
+    <input 
+      type="text" 
+      id="otp" 
+      formControlName="otp" 
+      inputmode="numeric" 
+      maxlength="6" 
+      autofocus>
+
+    <button type="submit" [disabled]="otpForm.invalid">Verify &amp; Continue</button>
+    
+    <button type="button" class="btn-secondary" (click)="resendOtp()">Resend OTP</button>
+  </form>
+
+  <p class="center-link">
+    The code expires in {{ secondsLeft }} seconds.
+  </p>
+</div>

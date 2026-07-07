@@ -1,0 +1,22 @@
+<div class="container">
+  <div class="seal">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+  </div>
+
+  <h1>Vote Recorded</h1>
+  <h2>Thank you — your vote is final</h2>
+
+  <ul class="flashes" *ngIf="messages && messages.length > 0">
+    <li *ngFor="let message of messages">{{ message }}</li>
+  </ul>
+
+  <p style="text-align:center; font-size:13px; color:var(--color-ink-soft); margin-top:0;">
+    Each voter may cast only one vote. A confirmation email has been sent
+    to your registered email address.
+  </p>
+
+  <a class="btn btn-block" style="margin-top:8px;" routerLink="/results">View Live Results</a>
+  <a class="btn btn-secondary btn-block" style="margin-top:8px; text-align:center;" routerLink="/logout">Logout</a>
+</div>

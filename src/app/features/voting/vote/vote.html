@@ -1,0 +1,34 @@
+<div class="container">
+  <p class="eyebrow">Official Ballot</p>
+  <h1>Cast Your Vote</h1>
+  <p class="voter-greeting">Logged in as <strong>{{ voterName }}</strong></p>
+
+  <ul class="flashes" *ngIf="messages && messages.length > 0">
+    <li *ngFor="let message of messages">{{ message }}</li>
+  </ul>
+
+  <form *ngIf="candidates && candidates.length > 0" [formGroup]="voteForm" (ngSubmit)="onSubmit()">
+    <div class="candidate-list">
+      <label *ngFor="let candidate of candidates" class="candidate-card" [for]="'cand-' + candidate.id">
+        <input 
+          type="radio" 
+          [id]="'cand-' + candidate.id" 
+          formControlName="selectedCandidateId" 
+          [value]="candidate.id">
+        <span>
+          <div class="candidate-name">{{ candidate.name }}</div>
+          <div class="candidate-party">{{ candidate.party }}</div>
+        </span>
+      </label>
+    </div>
+    
+    <button type="submit" [disabled]="voteForm.invalid">Submit Vote</button>
+  </form>
+
+  <p class="empty-note" *ngIf="!candidates || candidates.length === 0">
+    No candidates have been added yet. Please contact the election admin.
+  </p>
+
+  <hr class="tear-line">
+  <p class="center-link"><a routerLink="/logout">Logout</a></p>
+</div>

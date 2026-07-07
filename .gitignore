@@ -42,3 +42,18 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+# Angular / Node
+node_modules/
+dist/
+.angular/
+.cache/
+
+# Environment
+.env
+
+# IDE
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db

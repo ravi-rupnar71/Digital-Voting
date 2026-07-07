@@ -1,0 +1,31 @@
+<div class="container">
+  <p class="eyebrow">Election Administration</p>
+  <h1>Add Voter</h1>
+  <h2>A confirmation email with login details will be sent to the voter</h2>
+
+  <ul class="flashes" *ngIf="messages && messages.length > 0">
+    <li *ngFor="let message of messages">{{ message }}</li>
+  </ul>
+
+  <form [formGroup]="voterForm" (ngSubmit)="onSubmit()">
+    <label for="voter_id">Voter ID</label>
+    <input type="text" id="voter_id" formControlName="voter_id" placeholder="e.g. V003" autofocus>
+
+    <label for="name">Voter Name</label>
+    <input type="text" id="name" formControlName="name" placeholder="e.g. Jaysinh Shinde">
+
+    <label for="email">Voter Email</label>
+    <input type="email" id="email" formControlName="email" placeholder="voter@example.com">
+
+    <label for="password">Password</label>
+    <input type="text" id="password" formControlName="password" placeholder="Set a password for this voter">
+
+    <button type="submit" [disabled]="voterForm.invalid">Add Voter</button>
+  </form>
+
+  <hr class="tear-line">
+  
+  <p class="center-link">
+    <a routerLink="/admin-dashboard">← Back to Dashboard</a>
+  </p>
+</div>

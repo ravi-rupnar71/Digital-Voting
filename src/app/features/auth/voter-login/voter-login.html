@@ -1,0 +1,33 @@
+<div class="container">
+  <p class="eyebrow">Voter Login</p>
+  <h1>Sign in to vote</h1>
+  <h2>Enter your Voter ID and password to continue</h2>
+
+  <ul class="flashes" *ngIf="messages && messages.length > 0">
+    <li *ngFor="let message of messages">{{ message }}</li>
+  </ul>
+
+  <form [formGroup]="voterForm" (ngSubmit)="onSubmit()">
+    <label for="voterId">Voter ID</label>
+    <input id="voterId" type="text" formControlName="voterId" placeholder="Enter your voter ID">
+
+    <label for="password">Password</label>
+    <div class="password-field">
+      <input id="password" [type]="isPasswordVisible ? 'text' : 'password'" formControlName="password" placeholder="Enter your password">
+      <button type="button" class="eye-toggle" aria-label="Toggle password visibility" (click)="togglePassword()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20" aria-hidden="true">
+          <path *ngIf="!isPasswordVisible" d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"></path>
+          <circle *ngIf="!isPasswordVisible" cx="12" cy="12" r="3"></circle>
+          <path *ngIf="isPasswordVisible" d="M2 2l20 20"></path>
+          <path *ngIf="isPasswordVisible" d="M9.5 9.5a3 3 0 0 1 4.2 4.2"></path>
+          <path *ngIf="isPasswordVisible" d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"></path>
+        </svg>
+      </button>
+    </div>
+
+    <button type="button" (click)="onSubmit()">Continue</button>
+  </form>
+
+  <hr class="tear-line">
+  <p class="center-link"><a routerLink="/">← Back to Home</a></p>
+</div>

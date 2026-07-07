@@ -1,1 +1,489 @@
-/* You can add global styles to this file, and also import other style files */
+
+/* ---------------------------------------------------------
+  Global stylesheet mapping
+
+  Note: This file is the global stylesheet for the app.
+  Below each major section there's a short comment indicating
+  which pages/components primarily use those rules.
+
+  - Auth pages: src/app/features/auth/*
+  - Admin pages: src/app/features/admin/*
+  - Public pages: src/app/features/public/*
+  - Voting pages: src/app/features/voting/*
+  - Shared components: modals, flashes, container, buttons
+  --------------------------------------------------------- */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+/* Theme variables (applies app-wide)
+  Used by: All pages (global colors, typography, shadows) */
+:root {
+  /* Dark Mode & Glass Palette */
+  --color-bg-top: #0f172a; /* Deep slate blue */
+  --color-bg-bottom: #020617; /* Near black */
+  --color-card: rgba(30, 41, 59, 0.6); /* Semi-transparent slate */
+  --color-ink: #f8fafc; /* Crisp white for primary text */
+  --color-ink-soft: #94a3b8; /* Cool gray for secondary text */
+  --color-accent: #06b6d4; /* Neon Cyan */
+  --color-accent-dark: #0891b2; /* Deeper Cyan for hover */
+  --color-accent-glow: rgba(6, 182, 212, 0.3);
+  --color-success: #10b981; /* Emerald green */
+  --color-success-bg: rgba(16, 185, 129, 0.15);
+  --color-error: #f43f5e; /* Rose red */
+  --color-error-bg: rgba(244, 63, 94, 0.15);
+  --color-line: rgba(255, 255, 255, 0.1); /* Subtle transparent borders */
+
+  /* Typography */
+  --font-display: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  --font-body: 'Plus Jakarta Sans', -apple-system, sans-serif;
+
+  /* Elevations & Glows */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 8px 16px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 24px 48px rgba(0, 0, 0, 0.5);
+  --shadow-focus: 0 0 0 3px var(--color-accent-glow);
+}
+
+* { 
+  box-sizing: border-box; 
+  margin: 0;
+  padding: 0;
+}
+
+/* Base layout and page shell
+  Used by: All pages (body, spacing, overall background) */
+body {
+  min-height: 100vh;
+  font-family: var(--font-body);
+  color: var(--color-ink);
+  background: linear-gradient(135deg, var(--color-bg-top) 0%, var(--color-bg-bottom) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  line-height: 1.6;
+}
+
+.container {
+  /* Container card used by: auth pages, admin pages, public home, voting pages */
+  width: 100%;
+  max-width: 560px;
+  min-height: 640px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: var(--color-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--color-line);
+  border-radius: 20px;
+  box-shadow: var(--shadow-lg);
+  padding: 44px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Glowing top accent bar */
+.container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, #3b82f6, var(--color-accent), #8b5cf6);
+  box-shadow: 0 2px 10px var(--color-accent-glow);
+}
+
+.container.wide { 
+  max-width: 800px; 
+}
+
+a {
+  cursor: pointer;
+}
+
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  text-align: center;
+  margin: 0 0 12px;
+  font-weight: 700;
+  background: rgba(6, 182, 212, 0.1);
+  display: block;
+  padding: 6px 14px;
+  border-radius: 30px;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  border: 1px solid rgba(6, 182, 212, 0.2);
+}
+
+h1 {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: -0.03em;
+  margin: 0 0 8px;
+  background: linear-gradient(to right, #fff, #94a3b8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+h2 {
+  font-size: 15px;
+  font-weight: 400;
+  text-align: center;
+  color: var(--color-ink-soft);
+  margin: 0 0 32px;
+}
+
+/* Laser divider */
+.tear-line { 
+  border: none; 
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
+  opacity: 0.3;
+  margin: 32px 0; 
+}
+
+form { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 24px; 
+}
+
+label { 
+  font-size: 13px; 
+  font-weight: 600; 
+  color: var(--color-ink-soft); 
+  margin-bottom: -16px; 
+  display: block;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+input[type="text"], 
+input[type="password"], 
+input[type="email"] {
+  font-family: var(--font-body);
+  font-size: 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--color-line);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.5);
+  color: var(--color-ink);
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+input:focus { 
+  outline: none;
+  background: rgba(15, 23, 42, 0.8);
+  border-color: var(--color-accent); 
+  box-shadow: var(--shadow-focus);
+}
+
+input::placeholder {
+  color: #475569;
+}
+
+button, .btn {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  padding: 16px 24px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--color-accent), #3b82f6);
+  color: #fff;
+  cursor: pointer;
+  margin-top: 8px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px var(--color-accent-glow);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:hover, .btn:hover { 
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(6, 182, 212, 0.5);
+  filter: brightness(1.1);
+}
+
+button:active, .btn:active {
+  transform: translateY(0);
+}
+
+.btn-secondary { 
+  background: transparent; 
+  color: var(--color-ink); 
+  border: 1px solid var(--color-line); 
+  box-shadow: none;
+}
+
+.btn-secondary:hover { 
+  background: rgba(255, 255, 255, 0.05); 
+  border-color: var(--color-ink-soft);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-block { width: 100%; }
+
+/* ---------- password show/hide ---------- */
+.password-field { position: relative; }
+.password-field input { padding-right: 48px; }
+
+.eye-toggle {
+  position: absolute; 
+  right: 8px; 
+  top: 50%; 
+  transform: translateY(-50%);
+  background: none; 
+  border: none; 
+  margin: 0; 
+  padding: 8px; 
+  cursor: pointer;
+  color: var(--color-ink-soft); 
+  display: flex; 
+  align-items: center;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  box-shadow: none; /* Overrides global button shadow */
+}
+
+/* Force it to stay centered and remove global button hover effects */
+.eye-toggle:hover { 
+  color: var(--color-accent); 
+  background: rgba(6, 182, 212, 0.1);
+  transform: translateY(-50%); /* Prevents jumping */
+  box-shadow: none; 
+  filter: none; 
+}
+
+/* Force it to stay centered on click */
+.eye-toggle:active {
+  transform: translateY(-50%) scale(0.95);
+  box-shadow: none;
+}
+
+.eye-toggle svg { 
+  width: 20px; 
+  height: 20px; 
+  display: block; 
+}
+
+/* ---------- home page choice buttons ---------- */
+/* Used by: src/app/features/public/home */
+.choice-row { display: flex; flex-direction: column; gap: 16px; margin-top: 8px; }
+
+.choice-card {
+  display: block;
+  cursor: pointer;
+  text-decoration: none;
+  border: 1px solid var(--color-line);
+  border-radius: 16px;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--color-ink);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.choice-card:hover { 
+  border-color: var(--color-accent); 
+  background: rgba(6, 182, 212, 0.05);
+  box-shadow: 0 8px 24px var(--color-accent-glow);
+  transform: scale(1.02);
+}
+
+.choice-title { 
+  font-family: var(--font-display); 
+  font-size: 18px; 
+  font-weight: 700;
+  margin-bottom: 6px; 
+}
+.choice-sub { 
+  font-size: 14px; 
+  color: var(--color-ink-soft); 
+}
+
+/* ---------- candidate list (voting) ---------- */
+/* Used by: src/app/features/voting/* (vote, already-voted) */
+.candidate-list { display: flex; flex-direction: column; gap: 16px; margin-bottom: 8px; }
+
+.candidate-card {
+  border: 1px solid var(--color-line);
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.candidate-card:hover { 
+  border-color: var(--color-accent); 
+  background: rgba(6, 182, 212, 0.05);
+}
+
+.candidate-card input[type="radio"] { 
+  width: 22px; 
+  height: 22px; 
+  accent-color: var(--color-accent); 
+  cursor: pointer;
+  background: transparent;
+}
+
+.candidate-name { font-weight: 700; font-size: 16px; color: var(--color-ink); letter-spacing: 0.01em;}
+.candidate-party { font-size: 13px; color: var(--color-accent); margin-top: 4px; font-weight: 500;}
+
+/* ---------- custom modal ---------- */
+/* Used by: Shared across admin, auth, voting (confirmation modals) */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.8);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-backdrop.hidden {
+  display: none;
+}
+
+.modal-card {
+  width: min(420px, 100%);
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid var(--color-line);
+  border-radius: 18px;
+  box-shadow: var(--shadow-lg);
+  padding: 24px;
+  color: var(--color-ink);
+}
+
+.modal-card h3 {
+  font-size: 20px;
+  margin-bottom: 12px;
+  color: var(--color-ink);
+}
+
+.modal-card p {
+  color: var(--color-ink-soft);
+  margin-bottom: 20px;
+  white-space: pre-line;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.modal-actions .btn {
+  margin-top: 0;
+  padding: 12px 18px;
+}
+
+/* ---------- flash messages ---------- */
+/* Used by: Shared flash/notification area across pages */
+.flashes {
+  list-style: none; 
+  padding: 16px; 
+  margin: 0 0 24px;
+  background: var(--color-error-bg); 
+  color: #f51313;
+  border: 1px solid rgba(244, 63, 94, 0.3);
+  border-radius: 12px; 
+  font-size: 14px;
+  font-weight: 500;
+  white-space: pre-line;
+  backdrop-filter: blur(4px);
+}
+.flashes li + li { margin-top: 8px; }
+
+/* ---------- seal (confirmation page) ---------- */
+/* Used by: confirmation/receipt pages (public/results or post-vote) */
+.seal {
+  width: 96px; height: 96px; margin: 0 auto 32px;
+  border-radius: 50%; 
+  background: var(--color-success-bg);
+  display: flex; align-items: center; justify-content: center; position: relative;
+  border: 2px solid rgba(16, 185, 129, 0.3);
+  box-shadow: 0 0 24px rgba(16, 185, 129, 0.2);
+}
+.seal svg { width: 44px; height: 44px; stroke: var(--color-success); stroke-width: 2; }
+
+/* ---------- results: pie chart + table ---------- */
+/* Used by: src/app/features/public/results */
+.results-layout { display: flex; gap: 40px; align-items: center; flex-wrap: wrap; justify-content: center; }
+.pie-wrap svg { width: 240px; height: 240px; filter: drop-shadow(0 8px 16px rgba(0,0,0,0.3)); }
+.legend { flex: 1 1 240px; min-width: 240px; display: flex; flex-direction: column; gap: 16px; }
+.legend-row { display: flex; align-items: center; gap: 12px; font-size: 15px; }
+.legend-swatch { width: 18px; height: 18px; border-radius: 6px; flex-shrink: 0; box-shadow: 0 0 8px rgba(255,255,255,0.1); }
+.legend-name { font-weight: 600; flex: 1; }
+.legend-stats { color: var(--color-ink-soft); font-variant-numeric: tabular-nums; font-family: monospace; font-size: 14px;}
+
+table.data-table { width: 100%; border-collapse: collapse; margin-top: 32px; background: rgba(0,0,0,0.2); border-radius: 12px; overflow: hidden; border: 1px solid var(--color-line); }
+table.data-table th, table.data-table td { text-align: left; padding: 16px 20px; border-bottom: 1px solid var(--color-line); font-size: 14px; }
+table.data-table th { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-ink-soft); background: rgba(255,255,255,0.03); }
+table.data-table tr:last-child td { border-bottom: none; }
+table.data-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+.winner-tag {
+  display: inline-flex; align-items: center;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--color-success); background: var(--color-success-bg);
+  padding: 6px 12px; border-radius: 20px; margin-left: 12px;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.voted-yes { color: var(--color-success); font-weight: 700; display: inline-flex; align-items: center; gap: 6px; }
+.voted-yes::before { content: "✓"; background: var(--color-success-bg); border-radius: 50%; padding: 2px 6px; }
+.voted-no { color: var(--color-ink-soft); }
+
+.total-votes { text-align: center; font-size: 15px; font-weight: 600; color: var(--color-accent); margin: 32px 0 0; }
+.empty-note { text-align: center; font-size: 15px; color: var(--color-ink-soft); padding: 40px 0; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px dashed rgba(255,255,255,0.2); }
+
+.center-link { text-align: center; margin-top: 32px; font-size: 15px; }
+.center-link a { color: var(--color-accent); text-decoration: none; font-weight: 600; transition: all 0.2s; }
+.center-link a:hover { color: #fff; text-shadow: 0 0 8px var(--color-accent-glow); }
+
+.voter-greeting { text-align: center; font-size: 15px; font-weight: 600; color: var(--color-ink); margin: -16px 0 32px; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; border: 1px solid var(--color-line); }
+
+/* ---------- admin dashboard ---------- */
+/* Used by: src/app/features/admin/dashboard and related admin UIs */
+.stat-row { display: flex; gap: 20px; margin-bottom: 32px; flex-wrap: wrap; }
+.stat-box { 
+  flex: 1; 
+  min-width: 140px; 
+  border: 1px solid var(--color-line); 
+  border-radius: 16px; 
+  padding: 24px; 
+  text-align: center; 
+  background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.2) 100%); 
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+.stat-box:hover { transform: translateY(-4px); border-color: var(--color-accent); }
+.stat-box .stat-num { font-family: var(--font-display); font-size: 40px; font-weight: 700; color: var(--color-ink); margin-bottom: 8px; line-height: 1; text-shadow: 0 0 16px rgba(255,255,255,0.2); }
+.stat-box .stat-label { font-size: 12px; font-weight: 700; color: var(--color-accent); text-transform: uppercase; letter-spacing: 0.1em; }
+
+.action-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 32px; }
+.action-row .btn { flex: 1; min-width: 160px; text-align: center; }
+
+.section-title { font-size: 20px; font-weight: 700; margin: 40px 0 20px; color: var(--color-ink); border-bottom: 1px solid var(--color-line); padding-bottom: 12px;}
+.action-links { display: flex; gap: 12px; flex-wrap: wrap; }
+.action-links a { font-size: 14px; color: var(--color-ink-soft); text-decoration: none; font-weight: 600; padding: 6px 12px; background: rgba(255,255,255,0.05); border-radius: 8px; transition: all 0.2s; }
+.action-links a:hover { background: var(--color-accent); color: #fff; }

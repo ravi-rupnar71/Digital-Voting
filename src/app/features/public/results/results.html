@@ -1,0 +1,70 @@
+<div class="container wide">
+  <p class="eyebrow">Live Tally</p>
+  <h1>Election Results</h1>
+  <h2>Votes are counted automatically as they are cast</h2>
+
+  <p class="empty-note" *ngIf="total === 0">
+    No votes have been cast yet. Check back after voting opens.
+  </p>
+
+  <ng-container *ngIf="total > 0">
+    <div class="results-layout">
+      
+      <div class="pie-wrap">
+        <svg viewBox="0 0 200 200">
+          <ng-container *ngFor="let s of slices">
+            <circle 
+              *ngIf="s.full_circle" 
+              cx="100" cy="100" r="90" 
+              [attr.fill]="s.color">
+            </circle>
+            <path 
+              *ngIf="s.path && !s.full_circle" 
+              [attr.d]="s.path" 
+              [attr.fill]="s.color">
+            </path>
+          </ng-container>
+          <circle cx="100" cy="100" r="38" fill="var(--color-card)"></circle>
+        </svg>
+      </div>
+
+      <div class="legend">
+        <div class="legend-row" *ngFor="let s of slices">
+          <span class="legend-swatch" [style.background]="s.color"></span>
+          <span class="legend-name">{{ s.name }}</span>
+          <span class="legend-stats">{{ s.votes }} ({{ s.percent }}%)</span>
+        </div>
+      </div>
+    </div>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Candidate</th>
+          <th>Party</th>
+          <th>Votes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let candidate of candidates">
+          <td>
+            {{ candidate.name }}
+            <span class="winner-tag" *ngIf="maxVotes > 0 && candidate.votes === maxVotes">
+              Leading
+            </span>
+          </td>
+          <td>{{ candidate.party }}</td>
+          <td>{{ candidate.votes }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="total-votes">Total votes cast so far: <strong>{{ total }}</strong></p>
+  </ng-container>
+
+  <hr class="tear-line">
+  
+  <p class="center-link">
+    <a routerLink="/">← Back to Home</a>
+  </p>
+</div>
