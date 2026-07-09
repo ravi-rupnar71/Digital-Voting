@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { ApiService } from '../../../core/services/api';
 
 export interface Candidate {
   id: number;
@@ -30,8 +31,9 @@ export class ResultsComponent implements OnInit {
   maxVotes: number = 0;
   candidates: Candidate[] = [];
   slices: Slice[] = [];
+  errorMessage: string | null = null;
 
-  constructor() {}
+  constructor(private api: ApiService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.loadAndDisplayResults();
@@ -39,27 +41,45 @@ export class ResultsComponent implements OnInit {
 
   async loadAndDisplayResults() {
     try {
-      console.log('Fetching results with fetch()...');
-      const response = await fetch('http://localhost:5000/api/results');
-      const res = await response.json();
-      console.log('Fetch response:', res);
-      
-      if (!res) return;
-      
-      this.candidates = res.candidates || [];
-      this.total = res.total_votes || this.candidates.reduce((s: any, c: any) => s + (c.votes || 0), 0);
-      this.maxVotes = this.candidates.length > 0 ? Math.max(...this.candidates.map((c: any) => c.votes || 0)) : 0;
-      
-      console.log('Set total to:', this.total);
-      console.log('Set candidates to:', this.candidates);
+      this.errorMessage = null;
+      console.log('Fetching results via ApiService.getResults()...');
+      this.api.getResults().subscribe({
+        next: (res: any) => {
+          console.log('API response:', res);
+          this.applyResults(res);
+        },
+        error: (err: any) => {
+          console.error('Error loading results from API:', err);
+          this.errorMessage = 'Failed to load results from API. Retrying with fetch fallback.';
 
-      const colors = ['#06B6D4', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
-      this.slices = this.generatePieSlices(this.candidates, colors);
-      
-      console.log('Results loaded successfully. Total:', this.total);
+          fetch(this.api.getResultsEndpoint(), { credentials: 'include' })
+            .then((resp) => resp.json())
+            .then((res) => {
+              console.log('Fetch fallback response:', res);
+              this.applyResults(res);
+              this.errorMessage = null;
+            })
+            .catch((fetchErr) => {
+              console.error('Fetch fallback failed:', fetchErr);
+              this.errorMessage = 'Fetch fallback also failed — check server and CORS settings.';
+            });
+        }
+      });
     } catch (error) {
       console.error('Error loading results:', error);
     }
+  }
+
+  private applyResults(res: any) {
+    if (!res) return;
+
+    this.candidates = res.candidates || [];
+    this.total = (res.total_votes ?? this.candidates.reduce((s: any, c: any) => s + (c.votes || 0), 0));
+    this.maxVotes = this.candidates.length > 0 ? Math.max(...this.candidates.map((c: any) => c.votes || 0)) : 0;
+
+    const colors = ['#06B6D4', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
+    this.slices = this.generatePieSlices(this.candidates, colors);
+    this.cdr.detectChanges();
   }
 
   private generatePieSlices(candidates: Candidate[], colors: string[]): Slice[] {

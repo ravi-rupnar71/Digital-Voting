@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
+import { ApiService } from '../../../core/services/api';
+
 @Component({
   selector: 'app-edit-candidate',
   standalone: true,
@@ -15,11 +17,13 @@ export class EditCandidateComponent implements OnInit {
   editForm!: FormGroup;
   messages: string[] = [];
   candidateId!: number;
+  originalEmail = '';
 
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private apiService: ApiService
   ) { }
 
   ngOnInit(): void {
@@ -42,33 +46,35 @@ export class EditCandidateComponent implements OnInit {
   }
 
   loadCandidateData(id: number): void {
-    // TODO: Call your CandidateService to fetch data from your API
-    // Example Mock Data:
-    const mockDataFromApi = {
-      name: 'Candidate A',
-      party: 'Party One',
-      email: 'candidate@example.com'
-    };
-
-    // Pre-fill the form with the fetched data
-    this.editForm.patchValue({
-      name: mockDataFromApi.name,
-      party: mockDataFromApi.party,
-      email: mockDataFromApi.email
+    this.apiService.getCandidate(id).subscribe({
+      next: (candidateData) => {
+        this.originalEmail = candidateData.email || '';
+        this.editForm.patchValue({
+          name: candidateData.name,
+          party: candidateData.party,
+          email: candidateData.email
+        });
+      },
+      error: () => {
+        this.messages = ['Unable to load candidate details.'];
+      }
     });
   }
 
   onSubmit(): void {
     if (this.editForm.valid) {
-      // TODO: Call your CandidateService to send the PUT/POST request
       const updatedData = this.editForm.value;
-      console.log('Submitting updated candidate data:', updatedData);
-      
-      // Mock success behavior
-      this.messages = ['Candidate details updated successfully.'];
-      
-      // Optional: automatically route back to dashboard after a delay
-      // setTimeout(() => this.router.navigate(['/admin-dashboard']), 2000);
+      this.apiService.updateCandidate(this.candidateId, updatedData).subscribe({
+        next: () => {
+          this.messages = ['Please verify the updated details to complete the save.'];
+          this.router.navigate(['/verify-email', 'candidate', this.candidateId], {
+            state: { verificationEmail: updatedData.email, redirectTo: '/admin-dashboard' }
+          });
+        },
+        error: () => {
+          this.messages = ['Unable to update candidate details. Please try again.'];
+        }
+      });
     } else {
       this.messages = ['Please ensure all required fields are filled out correctly.'];
     }

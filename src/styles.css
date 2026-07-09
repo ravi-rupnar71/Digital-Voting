@@ -1,22 +1,4 @@
 
-/* ---------------------------------------------------------
-  Global stylesheet mapping
-
-  Note: This file is the global stylesheet for the app.
-  Below each major section there's a short comment indicating
-  which pages/components primarily use those rules.
-
-  - Auth pages: src/app/features/auth/*
-  - Admin pages: src/app/features/admin/*
-  - Public pages: src/app/features/public/*
-  - Voting pages: src/app/features/voting/*
-  - Shared components: modals, flashes, container, buttons
-  --------------------------------------------------------- */
-
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
-
-/* Theme variables (applies app-wide)
-  Used by: All pages (global colors, typography, shadows) */
 :root {
   /* Dark Mode & Glass Palette */
   --color-bg-top: #0f172a; /* Deep slate blue */

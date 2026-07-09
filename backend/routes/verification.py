@@ -32,15 +32,53 @@ def api_verify_account(entity, entity_id):
     entered_otp = data.get("otp", "").strip()
     expires_at = record.get("verification_expires_at")
     if expires_at and datetime.now() < datetime.fromisoformat(expires_at) and entered_otp == record.get("verification_otp"):
+        pending_update = session.pop("pending_update", None)
+        if pending_update and pending_update.get("entity") == entity and pending_update.get("entity_id") == entity_id:
+            update_data = pending_update.get("data", {})
+            if entity == "voter":
+                update_fields = []
+                values = []
+                if "voter_id" in update_data:
+                    update_fields.append("voter_id=%s")
+                    values.append(update_data["voter_id"])
+                if "name" in update_data:
+                    update_fields.append("name=%s")
+                    values.append(update_data["name"])
+                if "email" in update_data:
+                    update_fields.append("email=%s")
+                    values.append(update_data["email"])
+                if "password" in update_data and update_data["password"]:
+                    update_fields.append("password=%s")
+                    values.append(update_data["password"])
+                if update_fields:
+                    values.append(entity_id)
+                    cursor.execute(f"UPDATE voters SET {', '.join(update_fields)} WHERE id=%s", tuple(values))
+            else:
+                update_fields = []
+                values = []
+                if "name" in update_data:
+                    update_fields.append("name=%s")
+                    values.append(update_data["name"])
+                if "party" in update_data:
+                    update_fields.append("party=%s")
+                    values.append(update_data["party"])
+                if "email" in update_data:
+                    update_fields.append("email=%s")
+                    values.append(update_data["email"])
+                if "password" in update_data and update_data["password"]:
+                    update_fields.append("password=%s")
+                    values.append(update_data["password"])
+                if update_fields:
+                    values.append(entity_id)
+                    cursor.execute(f"UPDATE candidates SET {', '.join(update_fields)} WHERE id=%s", tuple(values))
+
         cursor.execute(f"UPDATE {table} SET is_verified = 1, verification_otp = '', verification_expires_at = '' WHERE id = %s", (entity_id,))
         conn.commit()
         cursor.close()
         conn.close()
-        # If a voter verified their email, create a session so they are immediately authenticated
-        if entity == 'voter':
+        if entity == 'voter' and not pending_update:
             session.clear()
             session['role'] = 'voter'
-            # prefer voter_id if present, otherwise fall back to numeric id
             session['voter_id'] = record.get('voter_id') or record.get('id')
             session['voter_name'] = record.get('name', '')
             response = make_response(jsonify({"message": "Verified successfully.", "role": "voter"}))

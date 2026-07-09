@@ -43,6 +43,7 @@ export class VerifyEmailComponent implements OnInit, OnDestroy {
       verificationEmail?: string;
       verificationOtp?: string;
       emailSent?: boolean;
+      redirectTo?: string;
     };
     if (navigationState?.verificationEmail) {
       this.targetEmail = navigationState.verificationEmail;
@@ -127,11 +128,8 @@ export class VerifyEmailComponent implements OnInit, OnDestroy {
         this.messages = ['Verification successful!'];
         // After verification, route to the appropriate login page so the user can sign in
         setTimeout(() => {
-          if (this.kind === 'voter') {
-            this.router.navigate(['/voter-login']);
-          } else {
-            this.router.navigate(['/admin-login']);
-          }
+          const redirectTo = history.state?.redirectTo || (this.kind === 'voter' ? '/voter-login' : '/admin-login');
+          this.router.navigate([redirectTo]);
         }, 1500);
       },
       error: err => {

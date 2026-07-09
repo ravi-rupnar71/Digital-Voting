@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -20,11 +20,13 @@ export class AdminOtpComponent implements OnInit, OnDestroy {
   // Timer state
   secondsLeft: number = 120;
   private timerInterval: any;
+  private readonly otpLifetimeSeconds = 120;
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private api: ApiService
+    private api: ApiService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -44,14 +46,23 @@ export class AdminOtpComponent implements OnInit, OnDestroy {
   }
 
   startTimer(): void {
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+    }
+
+    this.secondsLeft = this.otpLifetimeSeconds;
+    this.otpForm.get('otp')?.enable();
+
     this.timerInterval = setInterval(() => {
       if (this.secondsLeft > 0) {
         this.secondsLeft--;
       } else {
         clearInterval(this.timerInterval);
+        this.timerInterval = null;
         this.messages = ['Your OTP has expired. Please request a new one.'];
-        this.otpForm.get('otp')?.disable(); // Optionally disable input on expiry
+        this.otpForm.get('otp')?.disable();
       }
+      this.cdr.detectChanges();
     }, 1000);
   }
 
@@ -61,10 +72,8 @@ export class AdminOtpComponent implements OnInit, OnDestroy {
         this.messages = res?.fallback_otp
           ? [`A new code has been sent.`]
           : ['A new code has been sent to your email.'];
-        this.secondsLeft = 120; 
         this.otpForm.get('otp')?.enable();
         this.otpForm.reset();
-        clearInterval(this.timerInterval);
         this.startTimer();
       },
       error: err => {
@@ -75,19 +84,19 @@ export class AdminOtpComponent implements OnInit, OnDestroy {
   }
 
   onSubmit(): void {
-    if (this.otpForm.valid && this.secondsLeft > 0) {
-      const otpValue = this.otpForm.value.otp;
-      console.log('Verifying OTP:', otpValue);
-      
-      // TODO: Replace with your actual OTP verification service call
-      this.api.adminOtp({ otp: otpValue }).subscribe({
-        next: () => this.router.navigate(['/admin-dashboard']),
-        error: err => {
-          const msg = err?.error?.error || 'Invalid OTP. Please try again.';
-          this.messages = [msg];
-        }
-      });
+    if (!this.otpForm.valid || this.secondsLeft <= 0) {
+      this.messages = ['Please enter a valid 6-digit code.'];
+      return;
     }
+
+    const otpValue = this.otpForm.value.otp;
+    this.api.adminOtp({ otp: otpValue }).subscribe({
+      next: () => this.router.navigate(['/admin-dashboard']),
+      error: err => {
+        const msg = err?.error?.error || 'Invalid OTP. Please try again.';
+        this.messages = [msg];
+      }
+    });
   }
 
 }

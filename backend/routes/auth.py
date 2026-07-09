@@ -144,6 +144,7 @@ def api_voter_login():
     session["pending_voter_name"] = voter["name"]
     session["pending_voter_email"] = voter.get("email", "")
     session["otp_session_token"] = token
+    session.modified = True
 
     send_otp_email(voter.get("email", ""), voter.get("name", ""), otp, "voter")
     response = jsonify({"message": "OTP sent successfully.", "requires_otp": True, "fallback_otp": otp, "otp_session_token": token})
@@ -176,6 +177,7 @@ def api_voter_otp():
         token = _update_otp_state(token or _get_client_otp_token(data), context, otp) or token
         if token:
             session["otp_session_token"] = token
+            session.modified = True
         send_otp_email(context.get("voter_email", ""), context.get("voter_name", "Voter"), otp, "voter")
         response = jsonify({"message": "New OTP sent.", "fallback_otp": otp, "otp_session_token": token})
         if token:
@@ -247,6 +249,7 @@ def api_admin_login():
     session["pending_admin_email"] = admin_user.get("email", "")
     session["otp"] = otp
     session["otp_time"] = datetime.now().isoformat()
+    session.modified = True
 
     send_otp_email(admin_user.get("email", ""), admin_user.get("username", "admin"), otp, "admin")
     return jsonify({"message": "OTP sent successfully.", "requires_otp": True, "fallback_otp": otp})
@@ -262,6 +265,7 @@ def api_admin_otp():
         otp = generate_otp()
         session["otp"] = otp
         session["otp_time"] = datetime.now().isoformat()
+        session.modified = True
         send_otp_email(session.get("pending_admin_email", ""), session.get("pending_admin_username", "Admin"), otp, "admin")
         return jsonify({"message": "New OTP sent.", "fallback_otp": otp})
 

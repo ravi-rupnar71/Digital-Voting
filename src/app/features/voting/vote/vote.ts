@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
@@ -32,14 +32,33 @@ export class VoteComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private api: ApiService
+    private api: ApiService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.voteForm = this.fb.group({
       selectedCandidateId: ['', Validators.required]
     });
+    this.loadVoterIdentity();
     this.loadCandidates();
+  }
+
+  private loadVoterIdentity(): void {
+    this.api.getAuthStatus().subscribe({
+      next: (status: any) => {
+        const sessionName = status?.voter_name || status?.name || '';
+        if (sessionName) {
+          this.voterName = sessionName;
+          sessionStorage.setItem('voterName', sessionName);
+        } else {
+          this.voterName = sessionStorage.getItem('voterName') || 'Voter';
+        }
+      },
+      error: () => {
+        this.voterName = sessionStorage.getItem('voterName') || 'Voter';
+      }
+    });
   }
 
   private loadCandidates(): void {
@@ -49,24 +68,28 @@ export class VoteComponent implements OnInit {
 
     this.api.getCandidates().subscribe({
       next: (data: any) => {
-        // FIXED: Show a message on the screen instead of trying to navigate to a new page
         if (data?.has_voted) {
           this.messages = ['You have already voted!'];
           this.candidates = [];
           this.hasLoaded = true;
           this.isLoading = false;
+          this.cdr.detectChanges();
           return;
         }
 
         this.candidates = Array.isArray(data) ? data : (data?.candidates || []);
-        this.voterName = data?.voter_name || sessionStorage.getItem('voterName') || 'Voter';
+        if (!this.voterName) {
+          this.voterName = data?.voter_name || sessionStorage.getItem('voterName') || 'Voter';
+        }
 
         this.hasLoaded = true;
         this.isLoading = false;
         this.retryCount = 0;
+        
+        this.cdr.detectChanges();
       },
       error: (error: any) => {
-        console.error('Error loading candidates:', error);
+        console.error('❌ ERROR LOADING CANDIDATES:', error);
 
         if (error?.status === 401) {
           this.router.navigate(['/voter-login']);
@@ -83,6 +106,7 @@ export class VoteComponent implements OnInit {
         this.candidates = [];
         this.hasLoaded  = true;
         this.isLoading  = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -96,8 +120,8 @@ export class VoteComponent implements OnInit {
     const selectedId = Number(this.voteForm.value.selectedCandidateId);
 
     this.api.submitVote({ candidate_id: selectedId }).subscribe({
-      next: response => {
-        this.router.navigate(['/results']);
+      next: () => {
+        this.router.navigate(['/already-voted']);
       },
       error: error => {
         const msg = error?.error?.error || 'Unable to submit vote. Please try again.';
@@ -107,18 +131,12 @@ export class VoteComponent implements OnInit {
           this.router.navigate(['/voter-login']);
         }
         
-        // FIXED: Show a message if they already voted mid-session
         if (error?.status === 403) {
           this.messages = ['You have already voted!'];
           this.candidates = [];
+          this.cdr.detectChanges();
         }
       }
     });
   }
-
-  resetVote(): void {
-    this.voteForm.reset();
-    this.messages = [];
-  }
-
 }

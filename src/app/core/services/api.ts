@@ -8,7 +8,11 @@ import { Observable } from 'rxjs';
 export class ApiService {
   // This must match your Flask server URL
   // Use localhost host to match the dev server origin and avoid cross-host cookie issues
-  private baseUrl = 'http://localhost:5000/api'; 
+  private baseUrl = 'http://localhost:5000/api';
+
+  getResultsEndpoint(): string {
+    return `${this.baseUrl}/results`;
+  }
 
   // This tells Angular to send the session cookie to Flask so it knows you are logged in
   private httpOptions = {
@@ -37,12 +41,36 @@ export class ApiService {
     return this.http.post(`${this.baseUrl}/admin/otp`, otpData, this.httpOptions);
   }
 
+  getAuthStatus(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/auth/status`, this.httpOptions);
+  }
+
+  logout(): Observable<any> {
+    return this.http.post(`${this.baseUrl}/logout`, {}, this.httpOptions);
+  }
+
   addCandidate(candidateData: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/admin/candidate`, candidateData, this.httpOptions);
   }
 
   addVoter(voterData: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/admin/voter`, voterData, this.httpOptions);
+  }
+
+  updateVoter(id: number, voterData: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/admin/voter/${id}`, voterData, this.httpOptions);
+  }
+
+  updateCandidate(id: number, candidateData: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/admin/candidate/${id}`, candidateData, this.httpOptions);
+  }
+
+  deleteCandidate(id: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/admin/candidate/${id}`, this.httpOptions);
+  }
+
+  deleteVoter(id: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/admin/voter/${id}`, this.httpOptions);
   }
 
   // ================= VOTING =================
@@ -53,6 +81,18 @@ export class ApiService {
 
   getAdminDashboard(): Observable<any> {
     return this.http.get(`${this.baseUrl}/admin/dashboard`, this.httpOptions);
+  }
+
+  resetVotes(): Observable<any> {
+    return this.http.post(`${this.baseUrl}/admin/reset_votes`, {}, this.httpOptions);
+  }
+
+  getVoter(id: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/admin/voter/${id}`, this.httpOptions);
+  }
+
+  getCandidate(id: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/admin/candidate/${id}`, this.httpOptions);
   }
 
   submitVote(voteData: { candidate_id: number }): Observable<any> {
@@ -68,6 +108,6 @@ export class ApiService {
   // ================= RESULTS =================
 
   getResults(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/results`, this.httpOptions);
+    return this.http.get(this.getResultsEndpoint(), this.httpOptions);
   }
 }

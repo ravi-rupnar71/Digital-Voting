@@ -19,12 +19,17 @@ def create_app():
     app.config['PERMANENT_SESSION_LIFETIME'] = 3600  # 1 hour
 
     CORS(
-        app, 
-        supports_credentials=True, 
-        origins=["http://localhost:4200", "http://127.0.0.1:4200"],
+        app,
+        supports_credentials=True,
+        origins=[
+            "http://localhost:4200",
+            "http://127.0.0.1:4200",
+            "http://localhost:4201",
+            "http://127.0.0.1:4201",
+        ],
         allow_headers=["Content-Type", "Authorization"],
         expose_headers=["Content-Type"],
-        methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+        methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     )
 
     init_db()

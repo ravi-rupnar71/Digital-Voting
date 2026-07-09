@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
+import { ApiService } from '../../../core/services/api';
+
 @Component({
   selector: 'app-edit-voter',
   standalone: true,
@@ -15,11 +17,13 @@ export class EditVoterComponent implements OnInit {
   editVoterForm!: FormGroup;
   messages: string[] = [];
   voterDbId!: number; // The database ID of the voter, extracted from the route
+  originalEmail = '';
 
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private apiService: ApiService
   ) { }
 
   ngOnInit(): void {
@@ -42,33 +46,35 @@ export class EditVoterComponent implements OnInit {
   }
 
   loadVoterData(id: number): void {
-    // TODO: Call your VoterService to fetch data from your backend
-    // Example Mock Data representing what you'd get from the server:
-    const mockDataFromApi = {
-      voter_id: 'V003',
-      name: 'Jaysinh Shinde',
-      email: 'voter@example.com'
-    };
-
-    // 3. Pre-fill the form with the fetched data
-    this.editVoterForm.patchValue({
-      voter_id: mockDataFromApi.voter_id,
-      name: mockDataFromApi.name,
-      email: mockDataFromApi.email
+    this.apiService.getVoter(id).subscribe({
+      next: (voterData) => {
+        this.originalEmail = voterData.email || '';
+        this.editVoterForm.patchValue({
+          voter_id: voterData.voter_id,
+          name: voterData.name,
+          email: voterData.email
+        });
+      },
+      error: () => {
+        this.messages = ['Unable to load voter details.'];
+      }
     });
   }
 
   onSubmit(): void {
     if (this.editVoterForm.valid) {
-      // TODO: Call your VoterService to send the PUT/POST request
       const updatedData = this.editVoterForm.value;
-      console.log('Submitting updated voter data:', updatedData);
-      
-      // Mock success behavior
-      this.messages = ['Voter details updated successfully.'];
-      
-      // Optional: automatically route back to dashboard after a delay
-      // setTimeout(() => this.router.navigate(['/admin-dashboard']), 2000);
+      this.apiService.updateVoter(this.voterDbId, updatedData).subscribe({
+        next: () => {
+          this.messages = ['Please verify the updated details to complete the save.'];
+          this.router.navigate(['/verify-email', 'voter', this.voterDbId], {
+            state: { verificationEmail: updatedData.email, redirectTo: '/admin-dashboard' }
+          });
+        },
+        error: () => {
+          this.messages = ['Unable to update voter details. Please try again.'];
+        }
+      });
     } else {
       this.messages = ['Please ensure all required fields are filled out correctly.'];
     }

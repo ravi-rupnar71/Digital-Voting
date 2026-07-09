@@ -1,13 +1,15 @@
 <div class="container wide">
-  <p class="eyebrow">Live Tally</p>
+  <p class="eyebrow">Vote Tally</p>
   <h1>Election Results</h1>
   <h2>Votes are counted automatically as they are cast</h2>
 
-  <p class="empty-note" *ngIf="total === 0">
+  <p class="empty-note" *ngIf="total === 0 && candidates.length === 0">
     No votes have been cast yet. Check back after voting opens.
   </p>
 
-  <ng-container *ngIf="total > 0">
+  <p class="error-note" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+  <ng-container *ngIf="total > 0 || candidates.length > 0">
     <div class="results-layout">
       
       <div class="pie-wrap">

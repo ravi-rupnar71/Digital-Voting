@@ -141,9 +141,17 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       'Reset vote totals',
       'This will clear all recorded votes and reset the voting counters. Continue?',
       () => {
-        // Call your API service to reset votes here
-        console.log('Votes reset triggered');
-        this.messages = ['All votes have been reset.'];
+        this.api.resetVotes().subscribe({
+          next: () => {
+            this.messages = ['All votes have been reset.'];
+            this.loadDashboard();
+          },
+          error: (err: any) => {
+            const msg = err?.error?.error || 'Unable to reset votes.';
+            this.messages = [msg];
+            this.cdr.markForCheck();
+          }
+        });
       }
     );
   }
@@ -154,15 +162,26 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       : 'This candidate will be removed from the system. Continue?';
 
     this.openModal(`Delete ${type}`, message, () => {
-      // Call your API service to delete by ID and type here
-      console.log(`Deleted ${type} with ID: ${id}`);
-      
-      // Update local array for immediate UI refresh (Optimistic UI update)
-      if (type === 'voter') {
-        this.voters = this.voters.filter(v => v.id !== id);
-      } else {
-        this.candidates = this.candidates.filter(c => c.id !== id);
-      }
+      const deleteRequest = type === 'voter'
+        ? this.api.deleteVoter(id)
+        : this.api.deleteCandidate(id);
+
+      deleteRequest.subscribe({
+        next: () => {
+          if (type === 'voter') {
+            this.voters = this.voters.filter(v => v.id !== id);
+          } else {
+            this.candidates = this.candidates.filter(c => c.id !== id);
+          }
+          this.messages = [`${type === 'voter' ? 'Voter' : 'Candidate'} deleted successfully.`];
+          this.cdr.markForCheck();
+        },
+        error: (err: any) => {
+          const msg = err?.error?.error || `Unable to delete ${type}. Please try again.`;
+          this.messages = [msg];
+          this.cdr.markForCheck();
+        }
+      });
     });
   }
 

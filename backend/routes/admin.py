@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, session
 
 from ..db import INTEGRITY_ERRORS, get_db_connection, reset_votes
 from ..mail import send_verification_otp
@@ -96,11 +96,20 @@ def api_add_candidate():
     })
 
 
-@admin_bp.route("/api/admin/candidate/<int:candidate_id>", methods=["PUT", "DELETE"])
+@admin_bp.route("/api/admin/candidate/<int:candidate_id>", methods=["GET", "PUT", "DELETE"])
 @admin_required
 def api_manage_candidate(candidate_id):
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(dictionary=True)
+    if request.method == "GET":
+        cursor.execute("SELECT id, name, party, email, is_verified FROM candidates WHERE id = %s", (candidate_id,))
+        candidate = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        if not candidate:
+            return jsonify({"error": "Candidate not found."}), 404
+        return jsonify(candidate)
+
     if request.method == "DELETE":
         cursor.execute("DELETE FROM votes WHERE candidate_id = %s", (candidate_id,))
         cursor.execute("DELETE FROM candidates WHERE id = %s", (candidate_id,))
@@ -114,14 +123,27 @@ def api_manage_candidate(candidate_id):
     party = data.get("party", "").strip()
     email = data.get("email", "").strip()
     password = data.get("password", "").strip()
-    if password:
-        cursor.execute("UPDATE candidates SET name=%s, party=%s, email=%s, password=%s WHERE id=%s", (name, party, email, password, candidate_id))
-    else:
-        cursor.execute("UPDATE candidates SET name=%s, party=%s, email=%s WHERE id=%s", (name, party, email, candidate_id))
-    conn.commit()
+
+    session.pop("pending_update", None)
+    session["pending_update"] = {
+        "entity": "candidate",
+        "entity_id": candidate_id,
+        "data": {
+            "name": name,
+            "party": party,
+            "email": email,
+            **({"password": password} if password else {})
+        }
+    }
+    verification = send_verification_otp("candidate", candidate_id, email, name)
     cursor.close()
     conn.close()
-    return jsonify({"message": "Candidate updated."})
+    return jsonify({
+        "message": "Verification required to complete the update.",
+        "requires_verification": True,
+        "verification_otp": verification["otp"],
+        "email_sent": verification["email_sent"],
+    })
 
 
 @admin_bp.route("/api/admin/voter", methods=["POST"])
@@ -158,35 +180,54 @@ def api_add_voter():
     })
 
 
-@admin_bp.route("/api/admin/voter/<int:voter_id>", methods=["PUT", "DELETE"])
+@admin_bp.route("/api/admin/voter/<int:voter_id>", methods=["GET", "PUT", "DELETE"])
 @admin_required
 def api_manage_voter(voter_id):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    if request.method == "DELETE":
-        cursor.execute("SELECT has_voted, voter_id FROM voters WHERE id = %s", (voter_id,))
+    if request.method == "GET":
+        cursor.execute("SELECT id, voter_id, name, email, has_voted, is_verified FROM voters WHERE id = %s", (voter_id,))
         voter = cursor.fetchone()
-        if voter and voter["has_voted"] == 1:
-            cursor.close()
-            conn.close()
-            return jsonify({"error": "Voter has already voted, cannot delete."}), 403
-        cursor.execute("DELETE FROM votes WHERE voter_id = %s", (voter["voter_id"],))
+        cursor.close()
+        conn.close()
+        if not voter:
+            return jsonify({"error": "Voter not found."}), 404
+        return jsonify(voter)
+
+    if request.method == "DELETE":
+        cursor.execute("SELECT voter_id FROM voters WHERE id = %s", (voter_id,))
+        voter = cursor.fetchone()
+        if voter and voter["voter_id"]:
+            cursor.execute("DELETE FROM votes WHERE voter_id = %s", (voter["voter_id"],))
         cursor.execute("DELETE FROM voters WHERE id = %s", (voter_id,))
         conn.commit()
         cursor.close()
         conn.close()
-        return jsonify({"message": "Voter deleted."})
+        return jsonify({"message": "Voter deleted and associated votes removed."})
 
     data = request.json or {}
     v_id = data.get("voter_id", "").strip().upper()
     name = data.get("name", "").strip()
     email = data.get("email", "").strip()
     password = data.get("password", "").strip()
-    if password:
-        cursor.execute("UPDATE voters SET voter_id=%s, name=%s, email=%s, password=%s WHERE id=%s", (v_id, name, email, password, voter_id))
-    else:
-        cursor.execute("UPDATE voters SET voter_id=%s, name=%s, email=%s WHERE id=%s", (v_id, name, email, voter_id))
-    conn.commit()
+
+    session.pop("pending_update", None)
+    session["pending_update"] = {
+        "entity": "voter",
+        "entity_id": voter_id,
+        "data": {
+            "voter_id": v_id,
+            "name": name,
+            "email": email,
+            **({"password": password} if password else {})
+        }
+    }
+    verification = send_verification_otp("voter", voter_id, email, name)
     cursor.close()
     conn.close()
-    return jsonify({"message": "Voter updated."})
+    return jsonify({
+        "message": "Verification required to complete the update.",
+        "requires_verification": True,
+        "verification_otp": verification["otp"],
+        "email_sent": verification["email_sent"],
+    })
