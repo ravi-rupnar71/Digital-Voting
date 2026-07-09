@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -23,14 +23,15 @@ export class VerifyEmailComponent implements OnInit, OnDestroy {
   developmentOtp: string = '';
 
   // Timer state
-  secondsLeft: number = 300; 
+  secondsLeft: number = 120;
   private timerInterval: any;
 
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private api: ApiService
+    private api: ApiService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -96,6 +97,7 @@ export class VerifyEmailComponent implements OnInit, OnDestroy {
         this.messages = ['Your verification code has expired. Please request a new one.'];
         this.verifyForm.get('otp')?.disable();
       }
+      this.cdr.detectChanges();
     }, 1000);
   }
 
@@ -103,7 +105,7 @@ export class VerifyEmailComponent implements OnInit, OnDestroy {
     this.api.verify(this.kind, this.targetId, { resend: true }).subscribe({
       next: () => {
         this.messages = ['A new code has been sent to your email.'];
-        this.secondsLeft = 300; 
+        this.secondsLeft = 120;
         this.verifyForm.get('otp')?.enable();
         this.verifyForm.reset();
         clearInterval(this.timerInterval);
@@ -128,7 +130,7 @@ export class VerifyEmailComponent implements OnInit, OnDestroy {
         this.messages = ['Verification successful!'];
         // After verification, route to the appropriate login page so the user can sign in
         setTimeout(() => {
-          const redirectTo = history.state?.redirectTo || (this.kind === 'voter' ? '/voter-login' : '/admin-login');
+          const redirectTo = history.state?.redirectTo || (this.kind === 'candidate' ? '/admin-dashboard' : this.kind === 'voter' ? '/voter-login' : '/admin-login');
           this.router.navigate([redirectTo]);
         }, 1500);
       },

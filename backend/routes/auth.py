@@ -282,13 +282,14 @@ def api_admin_otp():
 
     if entered_otp == session["otp"]:
         admin_username = session.get("pending_admin_username", "admin")
-        
+
         session.clear()
-        
-        # Set new session data
+
+        # Preserve the admin role and username after OTP success
         session["role"] = "admin"
         session["admin_username"] = admin_username
-        
+        session.modified = True
+
         response = make_response(jsonify({"message": "Login successful", "role": "admin"}))
         return response
 

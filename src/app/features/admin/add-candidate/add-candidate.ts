@@ -36,7 +36,14 @@ export class AddCandidateComponent implements OnInit {
           this.candidateForm.reset();
           const candidateId = data?.candidate_id;
           if (candidateId) {
-            this.router.navigate(['/verify-email', 'candidate', candidateId]);
+            this.router.navigate(['/verify-email', 'candidate', candidateId], {
+              state: {
+                verificationEmail: this.candidateForm.value.email,
+                verificationOtp: data?.verification_otp,
+                emailSent: data?.email_sent,
+                redirectTo: '/admin-dashboard'
+              }
+            });
           }
         },
         error: err => {

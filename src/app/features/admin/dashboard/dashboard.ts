@@ -65,7 +65,11 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.api.getAdminDashboard().subscribe({
       next: (data: any) => {
         this.candidates = data?.candidates || [];
-        this.voters = data?.voters || [];
+        this.voters = [...(data?.voters || [])].sort((a, b) => {
+          const aId = String(a?.voter_id || '').toLowerCase();
+          const bId = String(b?.voter_id || '').toLowerCase();
+          return aId.localeCompare(bId, undefined, { numeric: true });
+        });
         this.lastRefreshedAt = new Date();
         this.cdr.markForCheck();
       },

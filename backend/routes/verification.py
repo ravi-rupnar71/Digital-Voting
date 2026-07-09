@@ -81,8 +81,13 @@ def api_verify_account(entity, entity_id):
             session['role'] = 'voter'
             session['voter_id'] = record.get('voter_id') or record.get('id')
             session['voter_name'] = record.get('name', '')
+            session.modified = True
             response = make_response(jsonify({"message": "Verified successfully.", "role": "voter"}))
             return response
+
+        if entity == 'candidate' and not pending_update:
+            session.modified = True
+            return jsonify({"message": "Verified successfully."})
 
         return jsonify({"message": "Verified successfully."})
     cursor.close()

@@ -31,7 +31,7 @@ export class AddVoterComponent implements OnInit {
   onSubmit(): void {
     if (this.voterForm.valid) {
       this.api.addVoter(this.voterForm.value).subscribe({
-        next: data => {
+        next: (data) => {
           this.messages = ['Voter successfully added. Verification email sent.'];
           const voterEmail = this.voterForm.value.email;
           const verificationOtp = data?.verification_otp;
@@ -43,7 +43,8 @@ export class AddVoterComponent implements OnInit {
               state: {
                 verificationEmail: voterEmail,
                 verificationOtp,
-                emailSent: verificationEmailSent
+                emailSent: verificationEmailSent,
+                redirectTo: '/admin-dashboard'
               }
             });
           }
