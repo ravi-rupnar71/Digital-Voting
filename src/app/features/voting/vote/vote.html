@@ -1,31 +1,54 @@
 <div class="container">
   <p class="eyebrow">Official Ballot</p>
   <h1>Cast Your Vote</h1>
-  <p class="voter-greeting">Logged in as <strong>{{ voterName }}</strong></p>
+  <p class="voter-greeting">Logged in as <strong>{{ voterName || 'Voter' }}</strong></p>
 
+  <!-- Error messages -->
   <ul class="flashes" *ngIf="messages && messages.length > 0">
     <li *ngFor="let message of messages">{{ message }}</li>
   </ul>
 
-  <form *ngIf="candidates && candidates.length > 0" [formGroup]="voteForm" (ngSubmit)="onSubmit()">
+  <!-- Loading -->
+  <p class="empty-note" *ngIf="isLoading">Loading candidates...</p>
+
+  <!-- Ballot form — only shown when candidates are loaded -->
+  <form
+    *ngIf="!isLoading && candidates && candidates.length > 0"
+    [formGroup]="voteForm"
+    (ngSubmit)="onSubmit()">
+
     <div class="candidate-list">
-      <label *ngFor="let candidate of candidates" class="candidate-card" [for]="'cand-' + candidate.id">
-        <input 
-          type="radio" 
-          [id]="'cand-' + candidate.id" 
-          formControlName="selectedCandidateId" 
-          [value]="candidate.id">
+      <label
+        *ngFor="let candidate of candidates"
+        class="candidate-card"
+        [for]="'cand-' + candidate.id">
+
+        <input
+          type="radio"
+          [id]="'cand-' + candidate.id"
+          formControlName="selectedCandidateId"
+          [value]="'' + candidate.id">
+
         <span>
           <div class="candidate-name">{{ candidate.name }}</div>
           <div class="candidate-party">{{ candidate.party }}</div>
         </span>
       </label>
     </div>
-    
-    <button type="submit" [disabled]="voteForm.invalid">Submit Vote</button>
+
+    <div class="button-group">
+      <button type="submit" [disabled]="voteForm.invalid" class="btn-block btn-primary">
+        Submit Vote
+      </button>
+      <button type="button" (click)="resetVote()" class="btn-block btn-secondary">
+        Reset
+      </button>
+    </div>
   </form>
 
-  <p class="empty-note" *ngIf="!candidates || candidates.length === 0">
+  <!-- No candidates -->
+  <p class="empty-note"
+     *ngIf="hasLoaded && messages.length === 0 && (!candidates || candidates.length === 0)">
     No candidates have been added yet. Please contact the election admin.
   </p>
 

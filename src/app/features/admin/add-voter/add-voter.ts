@@ -33,10 +33,19 @@ export class AddVoterComponent implements OnInit {
       this.api.addVoter(this.voterForm.value).subscribe({
         next: data => {
           this.messages = ['Voter successfully added. Verification email sent.'];
+          const voterEmail = this.voterForm.value.email;
+          const verificationOtp = data?.verification_otp;
+          const verificationEmailSent = data?.email_sent;
           this.voterForm.reset();
           const voterId = data?.voter_db_id;
           if (voterId) {
-            this.router.navigate(['/verify-email', 'voter', voterId]);
+            this.router.navigate(['/verify-email', 'voter', voterId], {
+              state: {
+                verificationEmail: voterEmail,
+                verificationOtp,
+                emailSent: verificationEmailSent
+              }
+            });
           }
         },
         error: err => {

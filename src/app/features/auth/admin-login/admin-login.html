@@ -1,7 +1,7 @@
 <div class="container">
-  <p class="eyebrow">Election Administration</p>
-  <h1>Admin Login</h1>
-  <h2>Manage candidates and voters</h2>
+  <p class="eyebrow">Admin Login</p>
+  <h1>Sign in to manage</h1>
+  <h2>Enter your username and password to continue</h2>
 
   <ul class="flashes" *ngIf="messages && messages.length > 0">
     <li *ngFor="let message of messages">{{ message }}</li>
@@ -9,11 +9,11 @@
 
   <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
     <label for="username">Username</label>
-    <input id="username" type="text" formControlName="username" placeholder="e.g. admin" autofocus>
+    <input id="username" type="text" formControlName="username" placeholder="Enter your username" autofocus>
 
     <label for="password">Password</label>
     <div class="password-field">
-      <input id="password" [type]="isPasswordVisible ? 'text' : 'password'" formControlName="password" placeholder="Enter admin password">
+      <input id="password" [type]="isPasswordVisible ? 'text' : 'password'" formControlName="password" placeholder="Enter your password">
       <button type="button" class="eye-toggle" aria-label="Toggle password visibility" (click)="togglePassword()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20" aria-hidden="true">
           <path *ngIf="!isPasswordVisible" d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"></path>
@@ -25,7 +25,7 @@
       </button>
     </div>
 
-    <button type="button" (click)="onSubmit()">Login</button>
+    <button type="button" (click)="onSubmit()">Continue</button>
   </form>
 
   <hr class="tear-line">

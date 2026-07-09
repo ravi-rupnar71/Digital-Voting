@@ -24,7 +24,7 @@
   --color-card: rgba(30, 41, 59, 0.6); /* Semi-transparent slate */
   --color-ink: #f8fafc; /* Crisp white for primary text */
   --color-ink-soft: #94a3b8; /* Cool gray for secondary text */
-  --color-accent: #06b6d4; /* Neon Cyan */
+  --color-accent: #32f1d8; /* Neon Cyan */
   --color-accent-dark: #0891b2; /* Deeper Cyan for hover */
   --color-accent-glow: rgba(6, 182, 212, 0.3);
   --color-success: #10b981; /* Emerald green */
@@ -487,3 +487,21 @@ table.data-table tr:hover td { background: rgba(255,255,255,0.02); }
 .action-links { display: flex; gap: 12px; flex-wrap: wrap; }
 .action-links a { font-size: 14px; color: var(--color-ink-soft); text-decoration: none; font-weight: 600; padding: 6px 12px; background: rgba(255,255,255,0.05); border-radius: 8px; transition: all 0.2s; }
 .action-links a:hover { background: var(--color-accent); color: #fff; }
+.action-links button {
+  font-size: 14px;
+  color: var(--color-ink-soft);
+  font-weight: 600;
+  padding: 6px 12px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 8px;
+  border: none;
+  box-shadow: none;
+  margin: 0;
+}
+.action-links button:hover {
+  background: var(--color-accent);
+  color: #fff;
+  transform: none;
+  box-shadow: none;
+  filter: none;
+}

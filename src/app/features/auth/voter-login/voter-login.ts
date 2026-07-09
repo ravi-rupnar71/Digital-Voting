@@ -47,8 +47,11 @@ export class VoterLoginComponent implements OnInit {
     };
 
     this.api.voterLogin(payload).subscribe({
-      next: () => {
+      next: (res: any) => {
         this.messages = [];
+        if (res?.otp_session_token) {
+          sessionStorage.setItem('voterOtpSessionToken', res.otp_session_token);
+        }
         this.router.navigate(['/voter-otp']);
       },
       error: error => {

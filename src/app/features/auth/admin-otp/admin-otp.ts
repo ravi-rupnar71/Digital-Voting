@@ -18,7 +18,7 @@ export class AdminOtpComponent implements OnInit, OnDestroy {
   messages: string[] = [];
   
   // Timer state
-  secondsLeft: number = 300; // Example: 5 minutes
+  secondsLeft: number = 120;
   private timerInterval: any;
 
   constructor(
@@ -57,9 +57,11 @@ export class AdminOtpComponent implements OnInit, OnDestroy {
 
   resendOtp(): void {
     this.api.adminOtp({ resend: true }).subscribe({
-      next: () => {
-        this.messages = ['A new code has been sent to your email.'];
-        this.secondsLeft = 300; 
+      next: (res: any) => {
+        this.messages = res?.fallback_otp
+          ? [`A new code has been sent.`]
+          : ['A new code has been sent to your email.'];
+        this.secondsLeft = 120; 
         this.otpForm.get('otp')?.enable();
         this.otpForm.reset();
         clearInterval(this.timerInterval);

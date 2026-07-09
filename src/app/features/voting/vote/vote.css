@@ -1,0 +1,168 @@
+/* Vote page specific styles */
+
+.voter-greeting {
+  text-align: center;
+  color: var(--color-ink-soft);
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.voter-greeting strong {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+/* Error/Success Messages */
+.flashes {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0;
+}
+
+.flashes li {
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  background: var(--color-error-bg);
+  border: 1px solid var(--color-error);
+  border-radius: 8px;
+  color: var(--color-error);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.flashes li.error-message {
+  background: var(--color-error-bg);
+  border-color: var(--color-error);
+  color: var(--color-error);
+}
+
+/* Login Prompt */
+.login-prompt {
+  background: rgba(6, 182, 212, 0.1);
+  border: 1px solid var(--color-accent);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+  text-align: center;
+  color: var(--color-ink-soft);
+  font-size: 14px;
+}
+
+.login-prompt .link-button {
+  color: var(--color-accent);
+  text-decoration: underline;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.login-prompt .link-button:hover {
+  color: var(--color-accent-dark);
+}
+
+/* Candidate List */
+.candidate-list {
+  max-height: calc(100vh - 400px);
+  overflow-y: auto;
+  margin-bottom: 16px;
+}
+
+.candidate-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.candidate-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+.candidate-list::-webkit-scrollbar-thumb {
+  background: var(--color-accent);
+  border-radius: 10px;
+}
+
+.candidate-list::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent-dark);
+}
+
+.candidate-card span {
+  flex: 1;
+}
+
+.empty-note {
+  text-align: center;
+  color: var(--color-ink-soft);
+  font-size: 14px;
+  padding: 32px 0;
+}
+
+/* Center link styling */
+.center-link {
+  text-align: center;
+  margin-top: 24px;
+}
+
+.center-link a {
+  color: var(--color-accent);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.center-link a:hover {
+  color: var(--color-accent-dark);
+}
+
+/* Button Group */
+.button-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.btn-block {
+  padding: 12px 24px;
+  border: 1px solid var(--color-accent);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.btn-primary {
+  background: var(--color-accent);
+  color: var(--color-bg-top);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-accent-dark);
+  box-shadow: 0 0 12px var(--color-accent-glow);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.btn-secondary:hover {
+  background: rgba(6, 182, 212, 0.1);
+  border-color: var(--color-accent-dark);
+  color: var(--color-accent-dark);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .button-group {
+    grid-template-columns: 1fr;
+  }
+}

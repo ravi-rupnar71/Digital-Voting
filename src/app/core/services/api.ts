@@ -7,6 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class ApiService {
   // This must match your Flask server URL
+  // Use localhost host to match the dev server origin and avoid cross-host cookie issues
   private baseUrl = 'http://localhost:5000/api'; 
 
   // This tells Angular to send the session cookie to Flask so it knows you are logged in
@@ -27,6 +28,7 @@ export class ApiService {
   }
 
   // ================= ADMIN AUTH =================
+  
   adminLogin(credentials: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/admin/login`, credentials, this.httpOptions);
   }
@@ -58,6 +60,7 @@ export class ApiService {
   }
 
   // ================= VERIFICATION =================
+  
   verify(entity: 'voter' | 'candidate', entityId: number, verifyData: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/verify/${entity}/${entityId}`, verifyData, this.httpOptions);
   }

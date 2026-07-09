@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ApiService } from '../../../core/services/api';
@@ -29,9 +29,12 @@ export interface Voter {
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.css']
 })
-export class AdminDashboardComponent implements OnInit {
+export class AdminDashboardComponent implements OnInit, OnDestroy {
+  private readonly autoRefreshMs = 5000;
+  private autoRefreshTimer: ReturnType<typeof setInterval> | null = null;
 
   messages: string[] = [];
+  lastRefreshedAt: Date | null = null;
   
   candidates: Candidate[] = [];
   voters: Voter[] = [];
@@ -42,9 +45,19 @@ export class AdminDashboardComponent implements OnInit {
   modalMessage = '';
   pendingAction: (() => void) | null = null;
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
+    this.loadDashboard();
+    this.startAutoRefresh();
+  }
+
+  ngOnDestroy(): void {
+    this.stopAutoRefresh();
+  }
+
+  @HostListener('window:focus')
+  onWindowFocus(): void {
     this.loadDashboard();
   }
 
@@ -53,12 +66,34 @@ export class AdminDashboardComponent implements OnInit {
       next: (data: any) => {
         this.candidates = data?.candidates || [];
         this.voters = data?.voters || [];
+        this.lastRefreshedAt = new Date();
+        this.cdr.markForCheck();
       },
       error: (err: any) => {
         const msg = err?.error?.error || 'Unable to load dashboard data.';
         this.messages = [msg];
+        this.lastRefreshedAt = new Date();
+        this.cdr.markForCheck();
       }
     });
+  }
+
+  refreshDashboard(): void {
+    this.loadDashboard();
+  }
+
+  private startAutoRefresh(): void {
+    this.stopAutoRefresh();
+    this.autoRefreshTimer = setInterval(() => {
+      this.loadDashboard();
+    }, this.autoRefreshMs);
+  }
+
+  private stopAutoRefresh(): void {
+    if (this.autoRefreshTimer) {
+      clearInterval(this.autoRefreshTimer);
+      this.autoRefreshTimer = null;
+    }
   }
 
   // Dynamic getter replacing the Jinja2 |selectattr filter

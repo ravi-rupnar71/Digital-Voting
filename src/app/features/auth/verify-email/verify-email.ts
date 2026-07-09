@@ -20,6 +20,7 @@ export class VerifyEmailComponent implements OnInit, OnDestroy {
   targetId!: number;
   kind: 'voter' | 'candidate' = 'voter'; // defaults to voter
   targetEmail: string = '';
+  developmentOtp: string = '';
 
   // Timer state
   secondsLeft: number = 300; 
@@ -37,6 +38,21 @@ export class VerifyEmailComponent implements OnInit, OnDestroy {
     this.verifyForm = this.fb.group({
       otp: ['', [Validators.required, Validators.pattern('^[0-9]{6}$')]]
     });
+
+    const navigationState = history.state as {
+      verificationEmail?: string;
+      verificationOtp?: string;
+      emailSent?: boolean;
+    };
+    if (navigationState?.verificationEmail) {
+      this.targetEmail = navigationState.verificationEmail;
+    }
+    if (navigationState?.verificationOtp) {
+      this.developmentOtp = navigationState.verificationOtp;
+      this.messages = navigationState.emailSent
+        ? ['Verification code has been sent to email.']
+        : ['Email delivery is not configured. A development OTP was generated on the server.'];
+    }
 
     // 2. Extract parameters from the URL (e.g., /verify/:kind/:id)
     this.route.paramMap.subscribe(params => {
@@ -65,8 +81,9 @@ export class VerifyEmailComponent implements OnInit, OnDestroy {
 
   loadTargetData(): void {
     // TODO: Call your backend service to fetch the email associated with this ID and Kind
-    // Mocking the data for demonstration:
-    this.targetEmail = this.kind === 'voter' ? 'voter@example.com' : 'candidate@example.com';
+    if (!this.targetEmail) {
+      this.targetEmail = this.kind === 'voter' ? 'voter@example.com' : 'candidate@example.com';
+    }
   }
 
   startTimer(): void {
@@ -108,7 +125,14 @@ export class VerifyEmailComponent implements OnInit, OnDestroy {
     this.api.verify(this.kind, this.targetId, { otp: otpValue }).subscribe({
       next: () => {
         this.messages = ['Verification successful!'];
-        setTimeout(() => this.router.navigate(['/admin-dashboard']), 1500);
+        // After verification, route to the appropriate login page so the user can sign in
+        setTimeout(() => {
+          if (this.kind === 'voter') {
+            this.router.navigate(['/voter-login']);
+          } else {
+            this.router.navigate(['/admin-login']);
+          }
+        }, 1500);
       },
       error: err => {
         const msg = err?.error?.error || 'Invalid or expired verification code.';

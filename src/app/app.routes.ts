@@ -13,7 +13,7 @@ import { EditVoterComponent } from './features/admin/edit-voter/edit-voter';
 import { ResultsComponent } from './features/public/results/results';
 import { VoteComponent as VotingPageComponent } from './features/voting/vote/vote';
 import { VoteRecordedComponent } from './features/voting/already-voted/already-voted';
-import { PageNotFound } from './features/public/page-not-found/page-not-found';
+import { PageNotFoundComponent } from './features/public/page-not-found/page-not-found';
 
 export const routes: Routes = [
   { path: '', component: VotingHomeComponent },
@@ -32,5 +32,5 @@ export const routes: Routes = [
   { path: 'edit-candidate/:id', component: EditCandidateComponent },
   { path: 'edit-voter/:id', component: EditVoterComponent },
   { path: 'logout', redirectTo: '', pathMatch: 'full' },
-  { path: '**', component: PageNotFound }
+  { path: '**', component: PageNotFoundComponent }
 ];
